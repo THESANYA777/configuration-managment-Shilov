@@ -1,0 +1,11 @@
+{
+  "root": {
+    "type": "dir",
+    "children": {
+      "hello.txt": {
+        "type": "file",
+        "content": "Привет из минимальной VFS!\n"
+      }
+    }
+  }
+}

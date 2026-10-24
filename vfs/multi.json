@@ -1,0 +1,47 @@
+{
+  "root": {
+    "type": "dir",
+    "children": {
+      "README.txt": {
+        "type": "file",
+        "content": "Демонстрационная VFS. Команды не изменяют этот JSON.\n"
+      },
+      "docs": {
+        "type": "dir",
+        "children": {
+          "guide.txt": {
+            "type": "file",
+            "content": "Пример текстового файла.\n"
+          },
+          "manual": {
+            "type": "dir",
+            "children": {
+              "chapter1.txt": {
+                "type": "file",
+                "content": "Глава 1: VFS хранится в памяти.\n"
+              },
+              "chapter2.txt": {
+                "type": "file",
+                "content": "Глава 2: данные загружаются из JSON.\n"
+              }
+            }
+          }
+        }
+      },
+      "media": {
+        "type": "dir",
+        "children": {
+          "sample.bin": {
+            "type": "file",
+            "encoding": "base64",
+            "content": "AAECVkZT/w=="
+          }
+        }
+      },
+      "empty": {
+        "type": "dir",
+        "children": {}
+      }
+    }
+  }
+}

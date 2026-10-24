@@ -1,0 +1,31 @@
+{
+  "root": {
+    "type": "dir",
+    "children": {
+      "level1": {
+        "type": "dir",
+        "children": {
+          "level2": {
+            "type": "dir",
+            "children": {
+              "level3": {
+                "type": "dir",
+                "children": {
+                  "level4": {
+                    "type": "dir",
+                    "children": {
+                      "deep.txt": {
+                        "type": "file",
+                        "content": "Файл на глубине пяти уровней каталога.\n"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
