@@ -1,31 +1,17 @@
-# Комплексный тест этапов 1–3. Ошибки намеренно включены.
 help
-vfsinfo
 pwd
 ls
 ls /
 ls /docs
-cat /README.txt
-cat /docs/guide.txt
-tree /
 cd /docs
 pwd
-ls
-cat guide.txt
-cd manual
+cd ..
+echo Hello, world!
+echo "Hello from PyCharm"
+who
+cat /README.txt
+cd /not_found
+ls /not_found
+cd
 pwd
-ls
-cat chapter1.txt
-cd /
-pwd
-cat /media/sample.bin
-ls /no-such-path
-cat /docs
-cat
-cd /README.txt
-cd /does-not-exist
-unknown-command
-ls too many arguments
-pwd extra
-cd /
-pwd
+exit

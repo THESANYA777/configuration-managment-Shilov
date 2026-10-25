@@ -271,9 +271,23 @@ class ShellEmulatorGUI:
                 "  cat <файл>           — вывести текстовый файл\n"
                 "  tree [путь]          — дерево VFS\n"
                 "  vfsinfo              — сведения о загруженной VFS\n"
+                "  echo [текст...]      — вывести текст в терминал\n"
+                "  who                  — показать пользователя и имя компьютера\n"
                 "  exit                 — выход\n"
                 "Пути абсолютные (/docs/readme.txt) или относительные (../file.txt)."
             )
+        if cmd == "echo":
+            # shlex.split уже обработал кавычки; соединяем аргументы пробелами,
+            # как обычная echo без поддержки перенаправления в файл.
+            return " ".join(args)
+        if cmd == "who":
+            if args:
+                raise ValueError("Использование: who")
+            try:
+                username = os.getlogin() if os.name != "nt" else os.environ.get("USERNAME", "user")
+            except Exception:
+                username = os.environ.get("USER", os.environ.get("USERNAME", "user"))
+            return f"{username} {socket.gethostname()}"
         if cmd in ("ls", "cd", "pwd", "cat", "tree", "vfsinfo") and self.vfs is None:
             raise VFSError("VFS не загружена. Проверьте --vfs-path и JSON-файл.")
         if cmd == "ls":
