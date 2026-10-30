@@ -14,4 +14,14 @@ cd /not_found
 ls /not_found
 cd
 pwd
-exit
+ls /
+rmdir /empty
+rmdir /docs
+rmdir
+chown alice /README.txt
+chown bob:developers /README.txt
+chown -R admin:admins /docs
+chown
+chown alice
+chown alice /does_not_exist
+vfsinfo

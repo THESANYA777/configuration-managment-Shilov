@@ -176,6 +176,45 @@ class VirtualFileSystem:
         visit(start, "")
         return "\n".join(lines)
 
+    def _parent_and_name(self, path: str):
+        absolute = self._absolute(path)
+        if absolute == "/":
+            raise VFSError("Нельзя удалить или изменить владельца корневого каталога этим способом.")
+        parent_path = str(PurePosixPath(absolute).parent)
+        name = PurePosixPath(absolute).name
+        parent = self._node(parent_path)
+        if parent.get("type") != "dir" or name not in parent.get("children", {}):
+            raise VFSError(f"Путь не найден: {absolute}")
+        return parent, name, parent["children"][name], absolute
+
+    def rmdir(self, path: str) -> str:
+        parent, name, node, absolute = self._parent_and_name(path)
+        if node.get("type") != "dir":
+            raise VFSError(f"Это не каталог: {absolute}")
+        if node.get("children", {}):
+            raise VFSError(f"Каталог не пуст: {absolute}")
+        if self.cwd == absolute or self.cwd.startswith(absolute.rstrip("/") + "/"):
+            raise VFSError(f"Нельзя удалить текущий каталог или его родителя: {absolute}")
+        del parent["children"][name]
+        return f"Каталог удалён из VFS в памяти: {absolute}"
+
+    def chown(self, owner_spec: str, path: str, recursive: bool = False) -> str:
+        if not owner_spec or owner_spec.startswith(":") or owner_spec.endswith(":") or owner_spec.count(":") > 1:
+            raise VFSError("Владелец должен иметь формат owner или owner:group.")
+        owner, separator, group = owner_spec.partition(":")
+        if not owner:
+            raise VFSError("Имя владельца не может быть пустым.")
+        _, _, node, absolute = self._parent_and_name(path)
+        def apply(target):
+            target["owner"] = owner
+            if separator:
+                target["group"] = group
+            if recursive and target.get("type") == "dir":
+                for child in target.get("children", {}).values():
+                    apply(child)
+        apply(node)
+        return f"Владелец {owner_spec} назначен: {absolute}" + (" (рекурсивно)" if recursive else "")
+
     def pwd(self) -> str:
         return self.cwd
 
@@ -273,6 +312,8 @@ class ShellEmulatorGUI:
                 "  vfsinfo              — сведения о загруженной VFS\n"
                 "  echo [текст...]      — вывести текст в терминал\n"
                 "  who                  — показать пользователя и имя компьютера\n"
+                "  rmdir <каталог>      — удалить пустой каталог из VFS в памяти\n"
+                "  chown [-R] owner[:group] <путь> — изменить владельца/группу в памяти\n"
                 "  exit                 — выход\n"
                 "Пути абсолютные (/docs/readme.txt) или относительные (../file.txt)."
             )
@@ -288,7 +329,7 @@ class ShellEmulatorGUI:
             except Exception:
                 username = os.environ.get("USER", os.environ.get("USERNAME", "user"))
             return f"{username} {socket.gethostname()}"
-        if cmd in ("ls", "cd", "pwd", "cat", "tree", "vfsinfo") and self.vfs is None:
+        if cmd in ("ls", "cd", "pwd", "cat", "tree", "vfsinfo", "rmdir", "chown") and self.vfs is None:
             raise VFSError("VFS не загружена. Проверьте --vfs-path и JSON-файл.")
         if cmd == "ls":
             if len(args) > 1:
@@ -316,8 +357,18 @@ class ShellEmulatorGUI:
             return (
                 f"JSON: {self.vfs.json_path}\n"
                 f"Текущий каталог: {self.vfs.pwd()}\n"
-                "Режим: только чтение; изменения VFS не сохраняются."
+                "Режим: изменения выполняются только в памяти; JSON на диске не изменяется."
             )
+        if cmd == "rmdir":
+            if len(args) != 1:
+                raise ValueError("Использование: rmdir <каталог>")
+            return self.vfs.rmdir(args[0])
+        if cmd == "chown":
+            recursive = bool(args and args[0] == "-R")
+            values = args[1:] if recursive else args
+            if len(values) != 2:
+                raise ValueError("Использование: chown [-R] owner[:group] <путь>")
+            return self.vfs.chown(values[0], values[1], recursive=recursive)
         raise ValueError(f"Неизвестная команда: {cmd}")
 
     def run_startup_script(self, script_path: str):
