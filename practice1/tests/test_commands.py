@@ -3,7 +3,7 @@ import socket
 import unittest
 from unittest.mock import Mock
 
-from emulator import ShellEmulatorGUI, VirtualFileSystem, VFSError
+from practice1.emulator import ShellEmulatorGUI, VirtualFileSystem, VFSError
 
 
 class CommandTests(unittest.TestCase):
@@ -11,7 +11,7 @@ class CommandTests(unittest.TestCase):
         self.shell = ShellEmulatorGUI.__new__(ShellEmulatorGUI)
         self.shell.root = Mock()
         self.shell.vfs = VirtualFileSystem(os.path.join(os.path.dirname(__file__),
-                                                        '../../../чат гпт/shell_emulator_stage3', 'vfs', 'multi.json'))
+                                                        '../../../../чат гпт/shell_emulator_stage3', 'vfs', 'multi.json'))
 
     def test_echo_empty_and_text(self):
         self.assertEqual(self.shell.execute_command('echo', []), '')

@@ -1,8 +1,7 @@
-import os
 import tempfile
 import unittest
 from pathlib import Path
-from emulator import VirtualFileSystem, VFSError
+from practice1.emulator import VirtualFileSystem, VFSError
 
 
 class Stage5Tests(unittest.TestCase):
